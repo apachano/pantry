@@ -1,13 +1,8 @@
 from flask import Flask, request
-import psycopg2
+from database import get_connection
 
 app = Flask(__name__)
-
-# Connect to your postgres DB
-conn = psycopg2.connect(host="localhost", dbname="postgres", user="postgres", password="salamander")
-
-# Open a cursor to perform database operations
-cur = conn.cursor()
+cur = get_connection()
 
 @app.get("/items")
 def getItems():
@@ -35,3 +30,6 @@ def deleteItem():
 @app.route("/")
 def hello_world():
     return "<p>Hello, World!</p>"
+
+if __name__ == "__main__":
+    app.run(debug=True)
