@@ -2,17 +2,22 @@
 version: '3.1'
 
 services:
-
   postgres:
     image: postgres
     restart: always
+    volumes:
+      - ./database:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: salamander
     ports:
       - 5432:5432
 
   pantry:
-    image: pantry
+    build: .
     restart: always
+    volumes:
+      - .:/src
+    # environment:
+    #   FLASK_DEBUG: "true"
     ports:
       - 5000:5000

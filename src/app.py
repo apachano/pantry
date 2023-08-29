@@ -1,5 +1,6 @@
 from flask import Flask, request
 from database import get_connection
+from item import Item
 
 app = Flask(__name__)
 cur = get_connection()
@@ -17,14 +18,28 @@ def getItem(id):
 @app.post("/items")
 def postItem():
     data = request.json
-    cur.execute(f"INSERT INTO pantry_items (name, description, expiration) VALUES ('{data.get('name')}','{data.get('description')}','{data.get('expiration')}') RETURNING *;")
-    item = cur.fetchall()
-    return item
+    if not data: return 'json expected', 400
+    if not data.get('name'): return 'name required', 400
+    
+    item = Item(json=data)
+    
+    cur.execute(f"INSERT INTO pantry_items {item.sql_list()} VALUES {item.sql_values()} RETURNING *;")
+    return cur.fetchall()
+
+@app.put("/items/<id>")
+def updateItem(id):
+    data = request.json
+    if not data: return 'json expected', 400
+
+    item = Item(json=data)
+    
+    cur.execute(f"UPDATE pantry_items SET {item.sql_list()} = ROW{item.sql_values()} WHERE id = {id} RETURNING *")
+    return cur.fetchall()
 
 @app.delete("/items/<id>")
-def deleteItem():
+def deleteItem(id):
     cur.execute(f"DELETE FROM pantry_items WHERE id = {id};")
-    return cur.fetchall()
+    return
 
 
 @app.route("/")

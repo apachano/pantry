@@ -1,8 +1,12 @@
 import psycopg2
+import logging
+
+logger = logging.getLogger(__name__)
 
 def get_connection():
     # Connect to your postgres DB
     conn = psycopg2.connect(host="postgres", dbname="postgres", user="postgres", password="salamander")
+    conn.autocommit = True
 
     # Open a cursor to perform database operations
     cur = conn.cursor()
