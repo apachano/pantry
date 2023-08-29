@@ -23,7 +23,7 @@ def postItem():
     
     item = Item(json=data)
     
-    cur.execute(f"INSERT INTO pantry_items {item.sql_list} VALUES {item.sql_values} RETURNING *;")
+    cur.execute(f"INSERT INTO pantry_items {item.sql_list()} VALUES {item.sql_values()} RETURNING *;")
     return cur.fetchall()
 
 @app.put("/items/<id>")
@@ -33,13 +33,13 @@ def updateItem(id):
 
     item = Item(json=data)
     
-    cur.execute(f"UPDATE pantry_items SET {item.sql_list} = {item.sql_values} WHERE id = {id}")
+    cur.execute(f"UPDATE pantry_items SET {item.sql_list()} = ROW{item.sql_values()} WHERE id = {id} RETURNING *")
     return cur.fetchall()
 
 @app.delete("/items/<id>")
 def deleteItem(id):
     cur.execute(f"DELETE FROM pantry_items WHERE id = {id};")
-    return cur.fetchall()
+    return
 
 
 @app.route("/")
